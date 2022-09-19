@@ -1,4 +1,5 @@
 var express = require('express');
+const { ObjectId } = require('mongodb');
 var router = express.Router();
 
 var dbo = require('../database/conn');
@@ -48,7 +49,12 @@ router.route('/customers').post(function (req, res) {
 // This section will help you delete a record.
 router.route('/customers/:id').delete((req, res) => {
   const dbConnect = dbo.getDb();
-  const listingQuery = { _id: req.body.id };
+  // const list = req.url.split('/')
+  const listingQuery = {
+    _id: ObjectId(
+      req.params.id
+    )
+  };
 
   dbConnect
     .collection('customers')
