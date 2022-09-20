@@ -72,4 +72,27 @@ router.route('/customers/:id').delete((req, res) => {
     });
 });
 
+// This section will help you update a record.
+router.route('/customers/:id').put((req, res) => {
+  const dbConnect = dbo.getDb();
+
+  const whereQuery = {
+    _id: ObjectId(req.params.id)
+  };
+
+  dbConnect.collection('customers').updateOne(whereQuery, {
+    $set: {
+      name: req.body.name
+    }
+  }, (err, _result) => {
+    if (err) {
+      res.status(400).send(`Something went wrong: ${err.toString()}`);
+    } else {
+      res.status(200).send({
+        message: 'Updated successfully'
+      });
+    }
+  });
+});
+
 module.exports = router;
