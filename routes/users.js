@@ -1,8 +1,14 @@
 var express = require('express');
 const { ObjectId } = require('mongodb');
+const mongoose = require('mongoose');
 var router = express.Router();
 
-var dbo = require('../database/conn');
+const dbo = require('../database/conn');
+// const addressSchema = require('../models/address');
+const customerSchema = require('../models/customer');
+
+// const Address = mongoose.model('Address', addressSchema);
+const Customer = mongoose.model('Customer', customerSchema, 'customers');
 
 /* GET users listing. */
 router.get('/', function (req, res, next) {
@@ -93,6 +99,19 @@ router.route('/customers/:id').put((req, res) => {
       });
     }
   });
+});
+
+
+/////MONGOOSE ::  >>>>>>>>
+router.route('/m-customers').get(async (req, res) => {
+  Customer.find(50)
+    .toArray(function (err, result) {
+      if (err) {
+        res.status(400).send('Error fetching listings!');
+      } else {
+        res.json(result);
+      }
+    });
 });
 
 module.exports = router;
