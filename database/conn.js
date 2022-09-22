@@ -1,42 +1,23 @@
+let mongoose = require('mongoose');
 
-const { MongoClient } = require('mongodb');
+const server = '127.0.0.1:27017'; // REPLACE WITH YOUR DB SERVER
+const database = 'mydb';      // REPLACE WITH YOUR DB NAME
 
-const mongoose = require('mongoose');
+class Database {
+    // constructor() {
+    //     this._connect()
+    // }
 
-const connectionString = 'mongodb://localhost:27017/mydb';
-const client = new MongoClient(connectionString, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-});
+    _connect() {
+        mongoose.connect(`mongodb://${server}/${database}`)
+            .then(() => {
+                console.log('Database connection successful')
+            })
+            .catch(err => {
+                console.error('Database connection error')
+            })
+    }
 
-let dbConnection;
+}
 
-module.exports = {
-    connectToServer: function (callback) {
-        // client.connect(function (err, db) {
-        //     if (err || !db) {
-        //         return callback(err);
-        //     }
-
-        //     dbConnection = db.db('mydb');
-        //     console.log('Successfully connected to MongoDB.');
-
-        //     // return callback();
-        // });
-        mongoose.createConnection(connectionString, {
-            useNewUrlParser: true,
-            useUnifiedTopology: true,
-        }, (error, result) => {
-            if (error) {
-                console.log(`${error.toString()}`);
-            } else {
-                dbConnection = result.db;
-                console.log('Database connected successfully');
-            }
-        });
-    },
-
-    getDb: function () {
-        return dbConnection;
-    },
-};
+module.exports = new Database()

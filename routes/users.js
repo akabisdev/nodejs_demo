@@ -103,15 +103,35 @@ router.route('/customers/:id').put((req, res) => {
 
 
 /////MONGOOSE ::  >>>>>>>>
+///Get request
 router.route('/m-customers').get(async (req, res) => {
-  Customer.find(50)
-    .toArray(function (err, result) {
-      if (err) {
-        res.status(400).send('Error fetching listings!');
-      } else {
-        res.json(result);
-      }
-    });
+
+  // Customer.find({}, function (err, customers) {
+  //   if (err) {
+  //     res.status(400).send(`Something went wrong: ${err.toString()}`);
+  //   } else {
+  //     // Prints "Space Ghost is a talk show host".
+  //     console.log(customers);
+  //     res.json(customers);
+  //   }
+  // });
+  try {
+    let result = await Customer.find({}).exec();
+    res.json(result);
+  } catch (e) {
+    res.status(400).send(`Something went wrong : ${e.toString()}`);
+  }
+});
+
+///Post request
+router.route('/m-customers').post(async (req, res) => {
+  try {
+    let customer = req.body;
+    await Customer.create(customer);
+    res.status(200).send({ message: 'Successfully created' });
+  } catch (e) {
+    res.status(400).send(`Something went wrong : ${e.toString()}`);
+  }
 });
 
 module.exports = router;

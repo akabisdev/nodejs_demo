@@ -12,7 +12,7 @@ var dbObj = require('./database/conn');
 var app = express();
 
 // connect with db
-dbObj.connectToServer();
+dbObj._connect();
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
