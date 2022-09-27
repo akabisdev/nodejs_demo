@@ -1,5 +1,5 @@
 var express = require('express');
-const { ObjectId } = require('mongodb');
+const { ObjectId, ObjectID } = require('mongodb');
 const mongoose = require('mongoose');
 var router = express.Router();
 
@@ -123,12 +123,23 @@ router.route('/m-customers').get(async (req, res) => {
   }
 });
 
+///Get particular record
+router.route('/m-customers/:id').get(async (req, res) => {
+  try {
+    let customerId = ObjectID(req.params.id);
+    let result = await Customer.find({ _id: customerId }).exec();
+    res.json(result);
+  } catch (e) {
+    res.status(400).send({ message: `${e.toString()}` });
+  }
+});
+
 ///Post request
 router.route('/m-customers').post(async (req, res) => {
   try {
     let customer = req.body;
-    await Customer.create(customer);
-    res.status(200).send({ message: 'Successfully created' });
+    let result = await Customer.create(customer);
+    res.status(200).send({ message: 'Successfully created', data: result });
   } catch (e) {
     res.status(400).send(`Something went wrong : ${e.toString()}`);
   }
