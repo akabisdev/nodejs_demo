@@ -105,19 +105,16 @@ router.route('/customers/:id').put((req, res) => {
 /////MONGOOSE ::  >>>>>>>>
 ///Get request
 router.route('/m-customers').get(async (req, res) => {
-
-  // Customer.find({}, function (err, customers) {
-  //   if (err) {
-  //     res.status(400).send(`Something went wrong: ${err.toString()}`);
-  //   } else {
-  //     // Prints "Space Ghost is a talk show host".
-  //     console.log(customers);
-  //     res.json(customers);
-  //   }
-  // });
   try {
-    let result = await Customer.find({}).exec();
-    res.json(result);
+    let count = await Customer.countDocuments();
+    let limit = req.query.limit ?? 2;
+    let skip = req.query.pageNumber > 1 ? ((req.query.pageNumber - 1) * limit) : 0;
+    let result = await Customer.find({}).sort({ name: 1 }).limit(limit).skip(skip).exec();
+    res.json({
+      message: "Successful",
+      data: result,
+      totalCount: count,
+    });
   } catch (e) {
     res.status(400).send(`Something went wrong : ${e.toString()}`);
   }
