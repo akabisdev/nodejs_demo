@@ -20,9 +20,12 @@ const customerSchema = new mongoose.Schema({
             return validator.isEmail(value)
         }
     },
-    address: [
+    addresses: [
         {
-            type: Address.schema,
+
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'addresses'
+
         }
     ]
 });

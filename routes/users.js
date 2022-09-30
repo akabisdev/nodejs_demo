@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 var router = express.Router();
 
 const dbo = require('../database/conn');
+const Address = require('../models/address');
 // const addressSchema = require('../models/address');
 const customerSchema = require('../models/customer');
 
@@ -109,12 +110,25 @@ router.route('/m-customers').get(async (req, res) => {
     let count = await Customer.countDocuments();
     let limit = req.query.limit ?? 2;
     let skip = req.query.pageNumber > 1 ? ((req.query.pageNumber - 1) * limit) : 0;
-    let result = await Customer.find({}).sort({ name: 1 }).limit(limit).skip(skip).exec();
-    res.json({
+
+    let results = await Customer.aggregate([{
+      $lookup: {
+        from: 'addresses',
+        localField: 'addresses',
+        foreignField: '_id',
+        as: 'addresses'
+      },
+    },
+    { $skip: skip, },
+    { $limit: parseInt(limit), },
+    ]);
+
+    return res.json({
       message: "Successful",
-      data: result,
+      data: results,
       totalCount: count,
     });
+
   } catch (e) {
     res.status(400).send(`Something went wrong : ${e.toString()}`);
   }
@@ -134,12 +148,24 @@ router.route('/m-customers/:id').get(async (req, res) => {
 ///Post request
 router.route('/m-customers').post(async (req, res) => {
   try {
+    let addresses = req.body.addresses;
+    let addressModels = await insertAddress(addresses);
     let customer = req.body;
+    let ids = [];
+    for (let id of addressModels) {
+      ids.push(id.toObject()._id);
+    }
+    customer.addresses = ids;
     let result = await Customer.create(customer);
     res.status(200).send({ message: 'Successfully created', data: result });
   } catch (e) {
     res.status(400).send(`Something went wrong : ${e.toString()}`);
   }
 });
+
+async function insertAddress(addresses) {
+  let results = await Address.insertMany(addresses);
+  return results;
+}
 
 module.exports = router;
