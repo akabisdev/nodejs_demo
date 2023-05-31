@@ -138,7 +138,18 @@ router.route('/m-customers').get(async (req, res) => {
 router.route('/m-customers/:id').get(async (req, res) => {
   try {
     let customerId = ObjectID(req.params.id);
-    let result = await Customer.find({ _id: customerId }).exec();
+    let result = await Customer.aggregate([{
+      $match: {
+        _id: customerId
+      }
+    }, {
+      $lookup: {
+        from: 'addresses',
+        localField: 'addresses',
+        foreignField: '_id',
+        as: 'addresses'
+      },
+    },]).exec();
     res.json(result);
   } catch (e) {
     res.status(400).send({ message: `${e.toString()}` });
