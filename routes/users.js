@@ -150,7 +150,11 @@ router.route('/m-customers/:id').get(async (req, res) => {
         as: 'addresses'
       },
     },]).exec();
-    res.json(result);
+    res.json({
+      message: "Successful",
+      data: result.length ? result[0] : 'No data found'
+    });
+    // res.json(result);
   } catch (e) {
     res.status(400).send({ message: `${e.toString()}` });
   }
